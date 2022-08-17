@@ -16,7 +16,15 @@ def main():
     ).run()
 
     feature_extractor = FeatureExtractor()
-    pass
+
+    model = SVM()
+    model.train(x_train, y_train)
+
+    print("Train Validation: ")
+    precision, recall, f1 = model.evaluate(x_train, y_train)
+
+    print("Test validation: ")
+    precision, recall, f1 = model.evaluate(x_test, y_test)
 
 
 if __name__ == "__main__":
