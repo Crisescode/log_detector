@@ -16,20 +16,6 @@ class FeatureExtractor(object):
         self.oov = None
 
     def fit_transform(self, X_seq, term_weighting=None, normalization=None, oov=False, min_count=1):
-        """ Fit and transform the data matrix
-
-        Arguments
-        ---------
-            X_seq: ndarray, log sequences matrix
-            term_weighting: None or `tf-idf`
-            normalization: None or `zero-mean`
-            oov: bool, whether to use OOV event
-            min_count: int, the minimal occurrence of events (default 0), only valid when oov=True.
-
-        Returns
-        -------
-            X_new: The transformed data matrix
-        """
         print('====== Transformed train data summary ======')
         self.term_weighting = term_weighting
         self.normalization = normalization
@@ -70,18 +56,6 @@ class FeatureExtractor(object):
         return X_new
 
     def transform(self, X_seq):
-        """ Transform the data matrix with trained parameters
-
-        Arguments
-        ---------
-            X: log sequences matrix
-            term_weighting: None or `tf-idf`
-
-        Returns
-        -------
-            X_new: The transformed data matrix
-        """
-        print('====== Transformed test data summary ======')
         X_counts = []
         for i in range(X_seq.shape[0]):
             event_counts = Counter(X_seq[i])

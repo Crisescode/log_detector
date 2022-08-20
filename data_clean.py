@@ -47,7 +47,6 @@ class LogAnalysis:
         for k in range(len(splitters)):
             if k % 2 == 0:
                 splitter = re.sub(' +', '\s+', splitters[k])
-                print(splitter)
                 regex += splitter
             else:
                 header = splitters[k].strip('<').strip('>')
@@ -63,9 +62,7 @@ class LogAnalysis:
             for line in fin.readlines():
                 try:
                     match = regex.search(line.strip())
-                    print("match: ", match)
                     message = [match.group(header) for header in headers]
-                    print("message: ", message)
                     log_message.append(message)
                     line_count += 1
                 except Exception as e:
@@ -81,15 +78,20 @@ class LogAnalysis:
         print("Loading logs ...")
         headers, rex = self.generate_log_format_rex(self.params.log_format)
 
-        print("headers: ", headers)
-        print("regex: ", rex)
         self.df_log = self.log_to_dataframe(
             log_file=os.path.join(self.params.path, self.log_name),
             regex=rex,
             headers=headers
         )
 
-        print(self.df_log.head())
+        for idx, line in self.df_log.iterrows():
+            line = line['Content']
+            if self.params.rex:
+                for currentRex in self.params.rex:
+                    line = re.sub(currentRex, '', line)
+
+            wordSeq = line.strip().split()
+            self.wordLL.append(tuple(wordSeq))
 
     def generate_term_pair(self):
         print("Generating term pair ...")

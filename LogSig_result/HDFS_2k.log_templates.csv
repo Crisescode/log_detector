@@ -1,0 +1,14 @@
+EventId,EventTemplate,Occurrences
+5afddfad,PacketResponder 1 for block terminating,108
+f4189416,PacketResponder 0 for block terminating,100
+5fd4a9f7,BLOCK* NameSystem.addStoredBlock: blockMap updated: is added to size 67108864,314
+ba3c93e0,PacketResponder 2 for block terminating,103
+698768b2,Received block of size 67108864 from /,277
+d5a7668f,Receiving block src: / dest: /,374
+22db39d4,BLOCK* NameSystem.allocateBlock:,115
+8af8295d,Verification succeeded for,20
+c7460255,Received block of size from /,15
+87a130e3,Deleting block file,263
+8885a7df,:Got exception while serving to /:,80
+41abde3b,BLOCK* NameSystem.delete: is added to invalidSet of,224
+83f566ef,BLOCK* ask to delete,7

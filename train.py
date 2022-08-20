@@ -6,8 +6,13 @@ from log_detector.data_loader import DataLoader
 from log_detector.preprocessing import FeatureExtractor
 
 
-train_csv = "./data/"
-label_csv = "./data/"
+# train_csv = "./LogSig_result/HDFS_2k.log_structured.csv"
+label_csv = "./data/anomaly_label.csv"
+train_csv = "./data/HDFS_100k.log_structured.csv"
+
+
+def data_clean():
+    pass
 
 
 def main():

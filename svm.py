@@ -6,13 +6,13 @@ from .utils import metrics
 
 
 class SVM(object):
-    def __init__(self, penalty="l1", tol=0.1, C=1, dual=False, class_wright=None, max_iter=100):
+    def __init__(self, penalty="l1", tol=0.1, C=1, dual=False, class_weight=None, max_iter=100):
         self.classifier = svm.LinearSVC(
             penalty=penalty,
             tol=tol,
             C=C,
             dual=dual,
-            class_wright=class_wright,
+            class_weight=class_weight,
             max_iter=max_iter
         )
 
