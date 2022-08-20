@@ -1,9 +1,9 @@
 # coding: utf-8
 
 
-from .svm import SVM
-from .data_loader import DataLoader
-from .preprocessing import FeatureExtractor
+from log_detector.svm import SVM
+from log_detector.data_loader import DataLoader
+from log_detector.preprocessing import FeatureExtractor
 
 
 train_csv = "./data/"
@@ -16,6 +16,8 @@ def main():
     ).run()
 
     feature_extractor = FeatureExtractor()
+    x_train = feature_extractor.fit_transform(x_train, term_weighting='tf-idf')
+    x_test = feature_extractor.transform(x_test)
 
     model = SVM()
     model.train(x_train, y_train)
