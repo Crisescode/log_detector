@@ -40,4 +40,5 @@ class DataCollectorWithElasticSearch:
         )
 
     def get_log(self):
+        # todo
         pass

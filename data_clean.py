@@ -106,22 +106,19 @@ class DataCleaner:
             self.termpairLLT.append(wordLT)
             i += 1
 
-        # termPairLogNumLD, used to account the occurrence of each termpair of each group
         for i in range(self.params.groupNum):
             newDict = dict()
             self.termPairLogNumLD.append(newDict)
             # initialize the item value to zero
             self.logNumPerGroup.append(0)
 
-        # divide logs into initial groupNum groups randomly, the group number of each log is stored in the groupIndex
         self.loglineNum = len(self.wordLL)
         random.seed(self.seed)
         for i in range(self.loglineNum):
-            ran = random.randint(0, self.params.groupNum - 1)  # group number from 0 to k-1
+            ran = random.randint(0, self.params.groupNum - 1)
             self.groupIndex[i] = ran
-            self.logNumPerGroup[ran] += 1  # count the number of loglines per group
+            self.logNumPerGroup[ran] += 1
 
-        # count the frequency of each termpairs per group
         i = 0
         for termpairLT in self.termpairLLT:
             j = 0
@@ -135,10 +132,6 @@ class DataCleaner:
             i += 1
 
     def LogMessParti(self):
-        """ Use local search, for each log, find the group that it should be moved to.
-            in this process, termpairs occurange should also make some changes and logNumber
-            of corresponding should be changed
-        """
         print('Log message partitioning...')
         changed = True
         while changed:
@@ -146,8 +139,8 @@ class DataCleaner:
             i = 0
             for termpairLT in self.termpairLLT:
                 curGroup = self.groupIndex[i]
-                alterGroup = potenFunc(curGroup, self.termPairLogNumLD, self.logNumPerGroup, i, termpairLT,
-                                       self.params.groupNum)
+                alterGroup = format_func(curGroup, self.termPairLogNumLD, self.logNumPerGroup, i, termpairLT,
+                                         self.params.groupNum)
                 if curGroup != alterGroup:
                     changed = True
                     self.groupIndex[i] = alterGroup
@@ -167,11 +160,7 @@ class DataCleaner:
                 i += 1
 
     def signatConstr(self):
-        """ Calculate the occurancy of each word of each group, and for each group, save the words that
-            happen more than half all log number to be candidateTerms(list of dict, words:frequency),
-        """
         print('Log message signature construction...')
-        # create the folder to save the resulted templates
         if not os.path.exists(self.params.savePath):
             os.makedirs(self.params.savePath)
 
@@ -180,7 +169,6 @@ class DataCleaner:
         candidateSeq = []
         self.signature = []
 
-        # save the all the log indexs of each group: logIndexPerGroup
         for t in range(self.params.groupNum):
             dic = dict()
             newlogIndex = []
@@ -189,9 +177,6 @@ class DataCleaner:
             self.logIndexPerGroup.append(newlogIndex)
             candidateSeq.append(newCandidate)
 
-        # count the occurence of each word of each log per group
-        # and save into the wordFreqPerGroup, which is a list of dictionary,
-        # where each dictionary represents a group, key is the word, value is the occurence
         lineNo = 0
         for wordL in self.wordLL:
             groupIndex = self.groupIndex[lineNo]
@@ -203,17 +188,11 @@ class DataCleaner:
                     wordFreqPerGroup[groupIndex][key] += 1
             lineNo += 1
 
-        # calculate the halfLogNum and select those words whose occurence is larger than halfLogNum
-        # as constant part and save into candidateTerm
         for i in range(self.params.groupNum):
             halfLogNum = math.ceil(self.logNumPerGroup[i] / 2.0)
             dic = dict((k, v) for k, v in wordFreqPerGroup[i].items() if v >= halfLogNum)
             candidateTerm.append(dic)
 
-        # scan each logline's each word that also is a part of candidateTerm, put these words together
-        # as a new candidate sequence, thus, each raw log will have a corresponding candidate sequence
-        # and count the occurence of these candidate sequence of each group and select the most frequent
-        # candidate sequence as the signature, i.e. the templates
         lineNo = 0
         for wordL in self.wordLL:
             curGroup = self.groupIndex[lineNo]
@@ -262,7 +241,11 @@ class DataCleaner:
         df_event['EventId'] = df_event['EventTemplate'].map(lambda x: hashlib.md5(x.encode('utf-8')).hexdigest()[0:8])
         df_event['Occurrences'] = df_event['EventTemplate'].map(occ_dict)
 
-        df_event.to_csv(os.path.join(self.params.savePath, self.log_name + '_templates.csv'), index=False, columns=["EventId", "EventTemplate","Occurrences"])
+        df_event.to_csv(os.path.join(
+            self.params.savePath, self.log_name + '_templates.csv'),
+            index=False,
+            columns=["EventId", "EventTemplate", "Occurrences"]
+        )
 
     def analyze(self, log_name: str):
         print("Parsing file: " + os.path.join(self.params.path, log_name))
@@ -276,19 +259,18 @@ class DataCleaner:
         print('Parsing done. [Time taken: {!s}]'.format(datetime.now() - start_time))
 
 
-def potenFunc(curGroupIndex, termPairLogNumLD, logNumPerGroup, lineNum, termpairLT, k):
+def format_func(curGroupIndex, termPairLogNumLD, logNumPerGroup, lineNum, termpairLT, k):
     maxDeltaD = 0
     maxJ = curGroupIndex
     for i in range(k):
-        returnedDeltaD = getDeltaD(logNumPerGroup, termPairLogNumLD, curGroupIndex, i, lineNum, termpairLT)
+        returnedDeltaD = get_deltaD(logNumPerGroup, termPairLogNumLD, curGroupIndex, i, lineNum, termpairLT)
         if returnedDeltaD > maxDeltaD:
             maxDeltaD = returnedDeltaD
             maxJ = i
     return maxJ
 
 
-# part of the potential function
-def getDeltaD(logNumPerGroup, termPairLogNumLD, groupI, groupJ, lineNum, termpairLT):
+def get_deltaD(logNumPerGroup, termPairLogNumLD, groupI, groupJ, lineNum, termpairLT):
     deltaD = 0
     Ci = logNumPerGroup[groupI]
     Cj = logNumPerGroup[groupJ]
@@ -305,16 +287,16 @@ def getDeltaD(logNumPerGroup, termPairLogNumLD, groupI, groupJ, lineNum, termpai
 if __name__ == "__main__":
     input_dir = "./data"
     output_dir = "./data/clean_result"
-    benchmark_settings = {
+    data_clean_settings = {
         'HDFS': {
-            'log_file': 'HDFS_2k.log',
+            'log_file': 'data_2k.log',
             'log_format': '<Date> <Time> <Pid> <Level> <Component>: <Content>',
             'regex': [r'blk_-?\d+', r'(\d+\.){3}\d+(:\d+)?'],
             'group_num': 15
         }
     }
 
-    for dataset, setting in benchmark_settings.items():
+    for dataset, setting in data_clean_settings.items():
         print("\n=== Evaluation on %s ===" % dataset)
         in_dir = os.path.join(input_dir, os.path.dirname(setting["log_file"]))
         log_file = os.path.basename(setting["log_file"])
