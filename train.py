@@ -1,18 +1,45 @@
 # coding: utf-8
 
+import os
 
-from log_detector.svm import SVM
-from log_detector.data_loader import DataLoader
-from log_detector.preprocessing import FeatureExtractor
+from svm import SVM
+from lr import LR
+from data_loader import DataLoader
+from data_clean import DataCleaner
+from preprocessing import FeatureExtractor
 
 
 # train_csv = "./LogSig_result/HDFS_2k.log_structured.csv"
 label_csv = "./data/anomaly_label.csv"
 train_csv = "./data/HDFS_100k.log_structured.csv"
 
+input_dir = "./data"
+data_clean_output_dir = "./data/clean_result"
+
 
 def data_clean():
-    pass
+    data_clean_settings = {
+        'HDFS': {
+            'log_file': "HDFS_2k.log",
+            'log_format': '<Date> <Time> <Pid> <Level> <Component>: <Content>',
+            'regex': [r'blk_-?\d+', r'(\d+\.){3}\d+(:\d+)?'],
+            'group_num': 15
+        }
+    }
+
+    for dataset, setting in data_clean_settings.items():
+        print("\n=== Evaluation on %s ===" % dataset)
+        in_dir = os.path.join(input_dir, os.path.dirname(setting["log_file"]))
+        log_file = os.path.basename(setting["log_file"])
+
+        parser = DataCleaner(
+            log_format=setting["log_format"],
+            input_path=input_dir,
+            output_path=data_clean_output_dir,
+            rex=setting["regex"],
+            group_num=setting["group_num"]
+        )
+        parser.analyze(log_file)
 
 
 def main():
@@ -25,6 +52,7 @@ def main():
     x_test = feature_extractor.transform(x_test)
 
     model = SVM()
+    # model = LR()
     model.train(x_train, y_train)
 
     print("Train Validation: ")
@@ -35,4 +63,5 @@ def main():
 
 
 if __name__ == "__main__":
+    # data_clean()
     main()

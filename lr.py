@@ -1,7 +1,7 @@
 # coding: utf-8
 
 from sklearn.linear_model import LogisticRegression
-from .utils import metrics
+from utils import metrics
 
 
 class LR(object):

@@ -20,7 +20,7 @@ class Params:
         self.log_format = log_format
 
 
-class LogAnalysis:
+class DataCleaner:
     def __init__(self, input_path: str, output_path: str, group_num: int, log_format: str, rex: List = [], seed=0):
         self.params = Params(
             path=input_path,
@@ -304,7 +304,7 @@ def getDeltaD(logNumPerGroup, termPairLogNumLD, groupI, groupJ, lineNum, termpai
 
 if __name__ == "__main__":
     input_dir = "./data"
-    output_dir = "./LogSig_result"
+    output_dir = "./data/clean_result"
     benchmark_settings = {
         'HDFS': {
             'log_file': 'HDFS_2k.log',
@@ -319,7 +319,7 @@ if __name__ == "__main__":
         in_dir = os.path.join(input_dir, os.path.dirname(setting["log_file"]))
         log_file = os.path.basename(setting["log_file"])
 
-        parser = LogAnalysis(
+        parser = DataCleaner(
             log_format=setting["log_format"],
             input_path=input_dir,
             output_path=output_dir,
