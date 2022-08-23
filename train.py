@@ -48,7 +48,7 @@ def main():
     ).run()
 
     feature_extractor = FeatureExtractor()
-    x_train = feature_extractor.fit_transform(x_train, term_weighting='tf-idf')
+    x_train = feature_extractor.train_transform(x_train, term_weighting='tf-idf')
     x_test = feature_extractor.transform(x_test)
 
     model = SVM()

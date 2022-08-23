@@ -15,7 +15,7 @@ class FeatureExtractor(object):
         self.normalization = None
         self.oov = None
 
-    def fit_transform(self, X_seq, term_weighting=None, normalization=None, oov=False, min_count=1):
+    def train_transform(self, X_seq, term_weighting=None, normalization=None, oov=False, min_count=1):
         print('====== Transformed train data summary ======')
         self.term_weighting = term_weighting
         self.normalization = normalization
